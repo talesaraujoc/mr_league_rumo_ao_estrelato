@@ -1,0 +1,8 @@
+primaria: #38003D
+secundaria: #BDE79A
+
+outras:
+#1C3D00
+#751F7D
+#5D9231
+#B55EBD
