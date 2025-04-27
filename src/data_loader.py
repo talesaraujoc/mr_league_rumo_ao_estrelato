@@ -1,3 +1,5 @@
+import os
+import json
 import gspread
 import pandas as pd
 from gspread_dataframe import get_as_dataframe
@@ -22,7 +24,8 @@ def carregar_dados_google_sheets(sheet_id: str = SHEET_ID, nome_aba: str = NOME_
     """
     try:
         scopes = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-        credentials = Credentials.from_service_account_file(ARQUIVO_CREDENCIAL, scopes=scopes)
+        service_account_info = json.loads(os.environ['GOOGLE_SERVICE_ACCOUNT'])
+        credentials = Credentials.from_service_account_file(service_account_info, scopes=scopes)
         client = gspread.authorize(credentials)
         sheet = client.open_by_key(sheet_id)
         worksheet = sheet.worksheet(nome_aba)
