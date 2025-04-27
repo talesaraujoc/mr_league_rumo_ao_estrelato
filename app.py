@@ -12,7 +12,7 @@ navbar = dbc.Navbar(
     dbc.Container([
         dbc.Row([
             dbc.Col(
-                dbc.NavbarBrand("X", className="ms-3"),
+                dbc.NavbarBrand("", className="ms-3"),
                 width="auto"
             ),
             dbc.Col(

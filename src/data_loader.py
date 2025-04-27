@@ -24,22 +24,27 @@ def carregar_dados_google_sheets(sheet_id: str = SHEET_ID, nome_aba: str = NOME_
     """
     try:
         scopes = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
+
+        # Lendo o JSON da variável de ambiente
         service_account_info = json.loads(os.environ['GOOGLE_SERVICE_ACCOUNT'])
-        credentials = Credentials.from_service_account_file(service_account_info, scopes=scopes)
+        credentials = Credentials.from_service_account_info(service_account_info, scopes=scopes)
+
+        # Conexão com o Google Sheets
         client = gspread.authorize(credentials)
         sheet = client.open_by_key(sheet_id)
         worksheet = sheet.worksheet(nome_aba)
 
+        # Carrega a planilha como DataFrame
         df = get_as_dataframe(worksheet, evaluate_formulas=True, dtype=str)
-        #df = df.dropna(how='all').dropna(axis=1, how='all')
 
+        # Aplica seu tratamento personalizado
         df = tratar_dataframe(df)
 
-        #print(f"[INFO] Dados carregados e tratados: {df.shape[0]} linhas, {df.shape[1]} colunas.")
+        # print(f"[INFO] Dados carregados e tratados: {df.shape[0]} linhas, {df.shape[1]} colunas.")
         return df
 
     except Exception as e:
-        #print(f"[ERRO] Falha ao carregar dados do Google Sheets: {str(e)}")
+        print(f"[ERRO] Falha ao carregar dados do Google Sheets: {str(e)}")
         return pd.DataFrame()
 
 
