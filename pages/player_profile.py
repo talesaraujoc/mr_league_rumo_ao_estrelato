@@ -7,17 +7,13 @@ import pandas as pd
 # Registrar a página
 register_page(__name__, path="/player_profile", name="Analítico por Jogador")
 
-# Carrega os dados
-df_full = carregar_dados_google_sheets()
-
 # Layout
 layout = dbc.Container([
     dbc.Row([
         dbc.Col([
-            #html.H2("Analítico por Jogador", className="text-center my-4", style={"color": "#38003D"}),
             dcc.Dropdown(
                 id='dropdown-jogador',
-                options=[{"label": jogador, "value": jogador} for jogador in sorted(df_full['PLAYER'].unique())],
+                options=[],  # 🔥 Opções serão carregadas dinamicamente
                 placeholder="Selecione um jogador",
                 style={"marginBottom": "20px"}
             )
@@ -44,7 +40,18 @@ layout = dbc.Container([
     ])
 ], fluid=True)
 
-# Callback principal
+# Callback para carregar as opções do dropdown
+@callback(
+    Output('dropdown-jogador', 'options'),
+    Input('dropdown-jogador', 'id')  # Dummy Input para carregar ao iniciar
+)
+def carregar_dropdown_jogadores(_):
+    df_full = carregar_dados_google_sheets()
+    jogadores = sorted(df_full['PLAYER'].unique())
+    options = [{"label": jogador, "value": jogador} for jogador in jogadores]
+    return options
+
+# Callback principal para atualizar gráfico e cards
 @callback(
     Output('grafico-pontos-rodada', 'figure'),
     Output('cartoes-estatisticas', 'children'),
@@ -52,6 +59,8 @@ layout = dbc.Container([
     Input('dropdown-jogador', 'value')
 )
 def atualizar_perfil(jogador):
+    df_full = carregar_dados_google_sheets()
+
     if jogador is None:
         return {}, [], []
 
@@ -60,7 +69,6 @@ def atualizar_perfil(jogador):
     # 🎯 Agrupamento de pontos por rodada
     df_agrupado = df_jogador.groupby('RODADA')['PTS'].sum().reset_index()
 
-    # Gráfico de Pontos por Rodada (agregado)
     fig = px.line(
         df_agrupado,
         x='RODADA',
@@ -93,7 +101,6 @@ def atualizar_perfil(jogador):
     posicao = df_jogador['POSIÇÃO'].iloc[0]
     cartoes = []
 
-    # Cartões das estatísticas principais
     cartoes.extend([
         criar_cartao('Gols', stats['GOL']),
         criar_cartao('Assistências', stats['ASS']),

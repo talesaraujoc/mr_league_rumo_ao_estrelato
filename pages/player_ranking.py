@@ -7,9 +7,6 @@ import pandas as pd
 # Registrar esta página
 register_page(__name__, path="/player_ranking", name="Ranking de Jogadores")
 
-# Carrega dados
-df_full = carregar_dados_google_sheets()
-
 # Layout
 layout = dbc.Container([
     dbc.Row([
@@ -20,7 +17,7 @@ layout = dbc.Container([
                 columns=[
                     {"name": "Posição", "id": "Posição"},
                     {"name": "Jogador", "id": "PLAYER"},
-                    #{"name": "Função", "id": "POSIÇÃO"},
+                    # {"name": "Função", "id": "POSIÇÃO"},  # se quiser adicionar
                     {"name": "Partidas", "id": "PARTIDAS"},
                     {"name": "V", "id": "V"},
                     {"name": "E", "id": "E"},
@@ -82,16 +79,16 @@ layout = dbc.Container([
 # Callback para carregar a tabela
 @callback(
     Output('tabela-ranking', 'data'),
-    Input('tabela-ranking', 'id')  # Dummy Input só para ativar
+    Input('tabela-ranking', 'id')  # Dummy Input só para ativar o callback no carregamento
 )
 def carregar_tabela(_):
-    df_ranking = df_full.copy()
+    df_full = carregar_dados_google_sheets()
 
     # Número de partidas jogadas (considera 1 linha = 1 jogo por jogador)
-    partidas_jogadas = df_ranking.groupby('PLAYER').size().reset_index(name='PARTIDAS')
+    partidas_jogadas = df_full.groupby('PLAYER').size().reset_index(name='PARTIDAS')
 
     # Agrupar somas de estatísticas por jogador
-    df_ranking = df_ranking.groupby(['PLAYER', 'POSIÇÃO']).agg({
+    df_ranking = df_full.groupby(['PLAYER', 'POSIÇÃO']).agg({
         'V': 'sum',
         'E': 'sum',
         'D': 'sum',

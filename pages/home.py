@@ -6,9 +6,6 @@ from src.data_loader import carregar_dados_google_sheets
 # Registrar esta página
 register_page(__name__, path="/")
 
-# Carrega os dados
-df_full = carregar_dados_google_sheets()
-
 # Layout da página
 layout = dbc.Container([
     # Cards de informações
@@ -108,6 +105,9 @@ layout = dbc.Container([
     Input('dropdown-metrica', 'value')
 )
 def atualizar_graficos(competicao, metrica):
+
+    df_full = carregar_dados_google_sheets()
+
     if competicao == "Todas":
         df = df_full.copy()
     else:

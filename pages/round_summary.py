@@ -7,9 +7,6 @@ from src.data_loader import carregar_dados_google_sheets
 # Registrar esta página
 register_page(__name__, path="/round_summary", name="Resumo da Rodada")
 
-# Carregar dados
-df_full = carregar_dados_google_sheets()
-
 # Lista de critérios disponíveis
 criterios_disponiveis = ['GOL', 'ASS', 'FALTA', 'GC', 'AMA', 'AZUL', 'VER', 'PP', 'GS', 'DD', 'DP']
 
@@ -71,6 +68,7 @@ layout = dbc.Container([
     Input('competicao-round', 'value')
 )
 def atualizar_rodadas(competicao):
+    df_full = carregar_dados_google_sheets()
     df = df_full[df_full['COMPETIÇÃO'] == competicao]
     rodadas = sorted(df['RODADA'].unique())
     options = [{"label": str(rodada), "value": rodada} for rodada in rodadas]
@@ -89,6 +87,7 @@ def atualizar_graficos_round(competicao, rodada, criterio):
     if rodada is None:
         return {}, {}
 
+    df_full = carregar_dados_google_sheets()
     df = df_full[(df_full['COMPETIÇÃO'] == competicao) & (df_full['RODADA'] == str(rodada))]
 
     # Gráfico V/E/D por Time
@@ -115,7 +114,6 @@ def atualizar_graficos_round(competicao, rodada, criterio):
         selector=dict(type='bar')
     )
 
-
     fig_ved.update_layout(
         plot_bgcolor='white',
         paper_bgcolor='white',
@@ -123,8 +121,8 @@ def atualizar_graficos_round(competicao, rodada, criterio):
         title_x=0.5,
         xaxis_title=None,
         yaxis_title=None,
-        bargap=0.25,  # espaçamento entre os grupos de barras
-        bargroupgap=0.1  # espaçamento entre barras dentro do mesmo grupo
+        bargap=0.25,
+        bargroupgap=0.1
     )
 
     # Gráfico Critério selecionado
